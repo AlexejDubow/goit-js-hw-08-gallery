@@ -1,23 +1,71 @@
-Задание
-Создай галерею с возможностью клика по ее элементам и просмотра полноразмерного изображения в модальном окне. Превью результата посмотри по ссылке.
+"use strict";
 
-Разбей задание на несколько подзадач:
+import galleryArray from "./gallery-items.js";
 
-Создание и рендер разметки по массиву данных и предоставленному шаблону.
-Реализация делегирования на галерее ul.js-gallery и получение url большого изображения.
-Открытие модального окна по клику на элементе галереи.
-Подмена значения атрибута src элемента img.lightbox__image.
-Закрытие модального окна по клику на кнопку button[data-action="close-modal"].
-Очистка значения атрибута src элемента img.lightbox__image. Это необходимо для того, чтобы при следующем открытии модального окна, пока грузится изображение, мы не видели предыдущее.
-Стартовые файлы
-В папке src ты найдешь стартовые файлы проекта с базовой разметкой и готовыми стилями.
-В файле gallery-items.js есть массив объектов содержащих информацию о изображениях: маленькое изображение, оригинальное и описание.
-Разметка элемента галереи
-Ссылка на оригинальное изображение должна храниться в data-атрибуте source на элементе img, и указываться в href ссылки (это необходимо для доступности).
+const ul = document.querySelector(".js-gallery");
 
-Дополнительно
-Следующий функционал не обязателен при сдаче задания, но будет хорошей практикой по работе с событиями.
+const img = galleryArray.map((item) => {
+  let images = document.createElement("img");
+  images.setAttribute("src", item.preview);
+  images.setAttribute("data-source", item.original);
+  images.setAttribute("alt", item.description);
+  images.classList.add("gallery__image");
+  return images;
+});
 
-Закрытие модального окна по клику на div.lightbox__overlay.
-Закрытие модального окна по нажатию клавиши ESC.
-Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо".
+const a = img.map((item) => {
+  let a = document.createElement("a");
+  a.setAttribute("href", item.original);
+  a.classList.add("gallery__link");
+  a.append(item);
+  return a;
+});
+
+const li = a.map((item) => {
+  let list = document.createElement("li");
+  list.classList.add("gallery__item");
+  list.append(item);
+  return list;
+});
+
+ul.append(...li);
+
+ul.addEventListener("click", openModal);
+
+function openModal(event) {
+  if (event.target == event.currentTarget) {
+    return;
+  }
+  event.preventDefault();
+
+  const divModal = document.querySelector(".js-lightbox");
+  divModal.classList.add("is-open");
+  const imgModal = document.querySelector(".lightbox__image");
+  imgModal.src = "";
+  imgModal.src = event.target.dataset.source;
+}
+
+const buttonClose = document.querySelector('[data-action="close-lightbox"]');
+buttonClose.addEventListener("click", closeModal);
+const overlay = document.querySelector(".lightbox__overlay");
+overlay.addEventListener("click", closeModal);
+
+document.addEventListener("keydown", (e) => {
+  if (e.code == "Escape") {
+    closeModal();
+  }
+  if (e.code == "ArrowRight") {
+    // console.log("ArrowRight")
+    // const imgModal = document.querySelector(".lightbox__image");
+
+    // console.dir(imgModal);
+  }
+  if (e.code == "ArrowLeft") {
+    // console.log("ArrowLeft")
+  }
+});
+
+function closeModal() {
+  const divModal = document.querySelector(".js-lightbox");
+  divModal.classList.remove("is-open");
+}
